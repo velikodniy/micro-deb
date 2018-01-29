@@ -21,6 +21,6 @@ install -D micro-$TAG/micro ./micro/usr/bin/micro
 rm micro.tar.gz
 rm -rf micro-$TAG
 
-sed -i -e "s/VERSION/$TAG/g" ./micro/DEBIAN/control
+sed -i -e "s/^Version:.*/Version: $TAG/g" ./micro/DEBIAN/control
 
 dpkg-deb --build micro
