@@ -26,17 +26,17 @@ function getPlatform {
 }
 
 platform=`getPlatform`
-TAG=`getLatestTag zyedidia/micro`
+tag=`getLatestTag zyedidia/micro`
 
-echo "Downloading https://github.com/zyedidia/micro/releases/download/v$TAG/micro-$TAG-"$platform".tar.gz"
-curl -L "https://github.com/zyedidia/micro/releases/download/v$TAG/micro-$TAG-"$platform".tar.gz" > micro.tar.gz
+echo "Downloading https://github.com/zyedidia/micro/releases/download/v$tag/micro-$tag-"$platform".tar.gz"
+curl -L "https://github.com/zyedidia/micro/releases/download/v$tag/micro-$tag-"$platform".tar.gz" > micro.tar.gz
 
-tar -xvzf micro.tar.gz "micro-$TAG/micro"
-install -D micro-$TAG/micro ./micro/usr/bin/micro
+tar -xvzf micro.tar.gz "micro-$tag/micro"
+install -D micro-$tag/micro ./micro/usr/bin/micro
 
 rm micro.tar.gz
-rm -rf micro-$TAG
+rm -rf micro-$tag
 
-sed -i -e "s/^Version:.*/Version: $TAG/g" ./micro/DEBIAN/control
+sed -i -e "s/^Version:.*/Version: $tag/g" ./micro/DEBIAN/control
 
 dpkg-deb --build micro
