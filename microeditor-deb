@@ -9,7 +9,10 @@ function getLatestTag {
     echo "${finalUrl##*v}"
 }
 
-function getPlatform {
+declare -A archname
+archname=([linux64]="amd64" [linux32]="i386" [linux-arm]="armhf")
+
+function getArch {
 	arch=`uname -p`
 	case $arch in
 		x86_64 | amd64)
@@ -25,18 +28,51 @@ function getPlatform {
 	esac
 }
 
-platform=`getPlatform`
+arch=`getArch`
 tag=`getLatestTag zyedidia/micro`
 
-echo "Downloading https://github.com/zyedidia/micro/releases/download/v$tag/micro-$tag-"$platform".tar.gz"
-curl -L "https://github.com/zyedidia/micro/releases/download/v$tag/micro-$tag-"$platform".tar.gz" > micro.tar.gz
+tmpdir=`mktemp -d`
+debdir="$tmpdir/DEBIAN"
+bindir="$tmpdir/usr/bin"
+mkdir "$debdir"
+mkdir -p "$bindir"
 
-tar -xvzf micro.tar.gz "micro-$tag/micro"
-install -D micro-$tag/micro ./micro/usr/bin/micro
+cat << EOT > "$debdir/control"
+Package: microeditor
+Version: 
+Architecture: ${archname[$arch]}
+Maintainer: Vadim Velikodniy <vadim@velikodniy.name>
+Section: text
+Priority: optional
+Homepage: https://github.com/zyedidia/micro
+Description: Micro editor
+  Micro is a terminal-based text editor that aims to be easy to use and intuitive, while also taking advantage of the full capabilities of modern terminals.
+EOT
 
-rm micro.tar.gz
-rm -rf micro-$tag
+cat << EOT > "$debdir/postinst"
+#!/bin/sh
+set -e
+if [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
+    update-alternatives --install /usr/bin/editor editor /usr/bin/micro 50
+fi
+EOT
+chmod +x "$debdir/postinst"
 
-sed -i -e "s/^Version:.*/Version: $tag/g" ./micro/DEBIAN/control
+cat << EOT > "$debdir/prerm"
+#!/bin/sh
+set -e
+if [ "\$1" != "upgrade" ]; then
+    update-alternatives --remove editor /usr/bin/micro
+fi
+EOT
+chmod +x "$debdir/prerm"
 
-dpkg-deb --build micro
+curl -L "https://github.com/zyedidia/micro/releases/download/v$tag/micro-$tag-$arch.tar.gz" > "$tmpdir/micro.tar.gz"
+tar -xvzf "$tmpdir/micro.tar.gz" -C "$bindir" --strip-components 1 "micro-$tag/micro"
+rm "$tmpdir/micro.tar.gz"
+
+sed -i -e "s/^Version:.*/Version: $tag/g" "$debdir/control"
+
+dpkg-deb --build "$tmpdir" "micro_${tag}_${archname[$arch]}.deb"
+
+rm -rf "$tmpdir"
