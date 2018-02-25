@@ -6,7 +6,4 @@ Section: text
 Priority: optional
 Homepage: https://github.com/zyedidia/micro
 Description: Micro editor
-  Micro is a terminal-based text editor
-  that aims to be easy to use and intuitive,
-  while also taking advantage of the full
-  capabilities of modern terminals.
+  Micro is a terminal-based text editor that aims to be easy to use and intuitive, while also taking advantage of the full capabilities of modern terminals.
