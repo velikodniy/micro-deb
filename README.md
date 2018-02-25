@@ -10,7 +10,7 @@ Usage
 Download the script and execute it:
 
 ```bash
-./microeditor-deb
+./micro-deb
 ```
 
 It will create a deb file in the current directory.
