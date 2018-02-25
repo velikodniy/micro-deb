@@ -4,13 +4,29 @@ set -e
 set -u
 set -o pipefail
 
-function githubLatestTag {
+function getLatestTag {
     finalUrl=`curl https://github.com/$1/releases/latest -s -L -I -o /dev/null -w '%{url_effective}'`
     echo "${finalUrl##*v}"
 }
 
-platform=linux64
-TAG=`githubLatestTag zyedidia/micro`
+function getPlatform {
+	arch=`uname -i`
+	case $arch in
+		x86_64 | amd64)
+			echo linux64
+			;;
+		
+		x86 | i386 | i686)
+			echo linux32
+			;;
+		armv7l)
+			echo linux-arm
+			;;
+	esac
+}
+
+platform=`getPlatform`
+TAG=`getLatestTag zyedidia/micro`
 
 echo "Downloading https://github.com/zyedidia/micro/releases/download/v$TAG/micro-$TAG-"$platform".tar.gz"
 curl -L "https://github.com/zyedidia/micro/releases/download/v$TAG/micro-$TAG-"$platform".tar.gz" > micro.tar.gz
