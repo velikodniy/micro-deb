@@ -1,5 +1,5 @@
-Microeditor debian package generator
-====================================
+Micro editor debian package generator
+=====================================
 
 This script downloads the latest version of [Micro editor](https://micro-editor.github.io/)
 and creates Debian package (.deb file).
