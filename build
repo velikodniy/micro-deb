@@ -10,7 +10,7 @@ function getLatestTag {
 }
 
 function getPlatform {
-	arch=`uname -i`
+	arch=`uname -p`
 	case $arch in
 		x86_64 | amd64)
 			echo linux64
